@@ -7,15 +7,15 @@ services:
       target: production # Явно указываем production stage
     container_name: node_app_prod
     ports:
-      - "5000:5000"
+      - "3000:3000"
     environment:
       - NODE_ENV=production
-      - POSTGRES_DB=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB_NAME=${POSTGRES_DB_NAME:-mydatabase_prod}
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
-      - POSTGRES_SSL=false
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-mydatabase_prod}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+      - DB_SSL=false
     env_file:
       - .env
     depends_on:
@@ -28,9 +28,9 @@ services:
     image: postgres:15-alpine
     container_name: postgres_db_prod
     environment:
-      - POSTGRES_DB=${POSTGRES_DB_NAME:-mydatabase_prod}
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
+      - POSTGRES_DB=${DB_NAME:-mydatabase_prod}
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-password}
     volumes:
       - postgres_data_prod:/var/lib/postgresql/data
     restart: unless-stopped

@@ -11,9 +11,9 @@ services:
       - "9229:9229" # Для отладки
     environment:
       - NODE_ENV=development
-      - POSTGRES_DB=postgres
+      - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
-      - POSTGRES_DB_NAME=${POSTGRES_DB_NAME:-mydatabase_dev}
+      - POSTGRES_DB=${POSTGRES_DB:-mydatabase_dev}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
     env_file:
@@ -30,9 +30,9 @@ services:
     image: postgres:15-alpine
     container_name: postgres_db_dev
     environment:
-      - POSTGRES_DB=${POSTGRES_DB_NAME:-mydatabase_dev}
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
+      - POSTGRES_DB=${DB_NAME:-mydatabase_dev}
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-password}
     ports:
       - "5432:5432"
     volumes:

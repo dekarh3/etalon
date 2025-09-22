@@ -12,7 +12,7 @@ const config: Record<string, Knex.Config>  = {
     connection: {
       host: process.env.POSTGRES_DB || 'localhost',
       port: parseInt(process.env.POSTGRES_PORT || '5432'),
-      database: process.env.POSTGRES_DB_NAME || 'mydatabase',
+      database: process.env.POSTGRES_DB || 'mydatabase',
       user: process.env.POSTGRES_USER || 'postgres',
       password: process.env.POSTGRES_PASSWORD || 'password',
       ssl: false,
@@ -35,7 +35,7 @@ const config: Record<string, Knex.Config>  = {
     connection: {
       host: process.env.POSTGRES_DB,
       port: parseInt(process.env.POSTGRES_PORT || '5432'),
-      database: process.env.POSTGRES_DB_NAME,
+      database: process.env.POSTGRES_DB,
       user: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       ssl: process.env.POSTGRES_SSL === 'true' ? { rejectUnauthorized: false } : false,
@@ -59,7 +59,7 @@ const config: Record<string, Knex.Config>  = {
     connection: {
       host: process.env.POSTGRES_DB || 'postgres',
       port: parseInt(process.env.POSTGRES_PORT || '5432'),
-      database: process.env.POSTGRES_DB_NAME || 'mydatabase',
+      database: process.env.POSTGRES_DB || 'mydatabase',
       user: process.env.POSTGRES_USER || 'postgres',
       password: process.env.POSTGRES_PASSWORD || 'password',
       ssl: false,
