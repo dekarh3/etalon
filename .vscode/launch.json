@@ -23,11 +23,12 @@
       "request": "attach",
       "port": 9229,
       "address": "localhost",
-      "restart": true,
       "localRoot": "${workspaceFolder}",
-      "remoteRoot": "${workspaceFolder}",
+      "remoteRoot": "/app",
+      "restart": false,
       "sourceMaps": true,
-      "timeout": 10000
+      "timeout": 10000,
+      "skipFiles": ["<node_internals>/**"],
     }
   ]
 }
