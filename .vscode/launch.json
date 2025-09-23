@@ -15,16 +15,19 @@
       "internalConsoleOptions": "neverOpen",
       "skipFiles": ["<node_internals>/**"],
       "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+      "smartStep": true
     },
     {
       "name": "Attach to Process",
       "type": "node",
       "request": "attach",
       "port": 9229,
+      "address": "localhost",
       "restart": true,
       "localRoot": "${workspaceFolder}",
-      "remoteRoot": "${workspaceFolder}"
+      "remoteRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "timeout": 10000
     }
   ]
 }

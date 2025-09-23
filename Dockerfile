@@ -18,7 +18,7 @@ COPY src/ ./src/
 COPY nodemon.json ./
 
 # Открываем порт для приложения и отладки
-EXPOSE 3000 9229
+EXPOSE 5000 9229
 
 # Команда для development
 CMD ["npm", "run", "dev"]
