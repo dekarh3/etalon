@@ -2,47 +2,61 @@ version: '3.8'
 
 services:
   app:
+    container_name: node_app_dev
     build:
       context: .
+      dockerfile: Dockerfile
       target: development # Явно указываем development stage
-    container_name: node_app_dev
     ports:
       - "5000:5000"
       - "9229:9229" # Для отладки
-    environment:
-      - NODE_ENV=development
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=${POSTGRES_DB:-mydatabase_dev}
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
     env_file:
       - .env
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PORT: ${APP_PORT}
+      NODE_ENV: development
     volumes:
+      - ./src/credentials:/app/dist/credentials:ro
       - .:/app
       - /app/node_modules # Чтобы не перезаписывать node_modules из контейнера
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
-      - app-network
+      - postgres-net
 
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16.1-alpine
     container_name: postgres_db_dev
     environment:
-      - POSTGRES_DB=${DB_NAME:-mydatabase_dev}
-      - POSTGRES_USER=${DB_USER:-postgres}
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-password}
+      - PGPORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data/pgdata
     ports:
-      - "5432:5432"
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
       - postgres_data_dev:/var/lib/postgresql/data
     networks:
-      - app-network
+      - postgres-net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
 
 volumes:
   postgres_data_dev:
+    driver: local
 
 networks:
-  app-network:
+  postgres-net:
     driver: bridge

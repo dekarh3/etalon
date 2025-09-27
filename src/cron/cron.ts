@@ -22,7 +22,7 @@ export class TariffJob {
         });
 
         job.start();
-        console.log("Tariff update job started.");
+        console.log("Tariff update cron started.");
     }
 
     async updateTariffs(): Promise<void> {

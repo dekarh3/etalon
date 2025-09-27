@@ -1,83 +1,70 @@
-import * as dotenv from 'dotenv';
-import type { Knex } from 'knex';
+import env from "#config/env/env";
+import { Knex } from "knex";
+import { z } from "zod";
 
-dotenv.config();
+const connectionSchema = z.object({
+    host: z.string(),
+    port: z.number(),
+    database: z.string(),
+    user: z.string(),
+    password: z.string(),
+});
 
-const isProduction = process.env.NODE_ENV === 'production';
-const sslConfig = isProduction ? { rejectUnauthorized: false } : false;
+const NODE_ENV = env.NODE_ENV ?? "development";
 
-const config: Record<string, Knex.Config>  = {
-  development: {
-    client: 'postgresql',
-    connection: {
-      host: process.env.POSTGRES_DB || 'localhost',
-      port: parseInt(process.env.POSTGRES_PORT || '5432'),
-      database: process.env.POSTGRES_DB || 'mydatabase',
-      user: process.env.POSTGRES_USER || 'postgres',
-      password: process.env.POSTGRES_PASSWORD || 'password',
-      ssl: false,
+const knegConfigs: Record<typeof NODE_ENV, Knex.Config> = {
+    development: {
+        client: "pg",
+        connection: () =>
+            connectionSchema.parse({
+                host: env.POSTGRES_HOST ?? "localhost",
+                port: env.POSTGRES_PORT ?? 5432,
+                database: env.POSTGRES_DB ?? "postgres",
+                user: env.POSTGRES_USER ?? "postgres",
+                password: env.POSTGRES_PASSWORD ?? "postgres",
+            }),
+        pool: {
+            min: 2,
+            max: 10,
+        },
+        migrations: {
+            stub: "src/config/knex/migration.stub.js",
+            directory: "./src/postgres/migrations",
+            tableName: "migrations",
+            extension: "ts",
+        },
+        seeds: {
+            stub: "src/config/knex/seed.stub.js",
+            directory: "./src/postgres/seeds",
+            extension: "js",
+        },
     },
-    pool: {
-      min: 2,
-      max: 10,
+    production: {
+        client: "pg",
+        connection: () =>
+            connectionSchema.parse({
+                host: env.POSTGRES_HOST,
+                port: env.POSTGRES_PORT,
+                database: env.POSTGRES_DB,
+                user: env.POSTGRES_USER,
+                password: env.POSTGRES_PASSWORD,
+            }),
+        pool: {
+            min: 2,
+            max: 10,
+        },
+        migrations: {
+            stub: "dist/config/knex/migration.stub.js",
+            directory: "./dist/postgres/migrations",
+            tableName: "migrations",
+            extension: "js",
+        },
+        seeds: {
+            stub: "src/config/knex/seed.stub.js",
+            directory: "./dist/postgres/seeds",
+            extension: "js",
+        },
     },
-    migrations: {
-      tableName: 'knex_migrations',
-      directory: './src/postgres/migrations',
-    },
-    seeds: {
-      directory: './src/postgres/seeds',
-    },
-  },
-
-  production: {
-    client: 'postgresql',
-    connection: {
-      host: process.env.POSTGRES_DB,
-      port: parseInt(process.env.POSTGRES_PORT || '5432'),
-      database: process.env.POSTGRES_DB,
-      user: process.env.POSTGRES_USER,
-      password: process.env.POSTGRES_PASSWORD,
-      ssl: process.env.POSTGRES_SSL === 'true' ? { rejectUnauthorized: false } : false,
-    },
-    pool: {
-      min: 2,
-      max: 10,
-    },
-    migrations: {
-      tableName: 'knex_migrations',
-      directory: './dist/postgres/migrations',
-    },
-    seeds: {
-      directory: './dist/postgres/seeds',
-    },
-  },
-
-  // Конфигурация для Docker
-  docker: {
-    client: 'postgresql',
-    connection: {
-      host: process.env.POSTGRES_DB || 'postgres',
-      port: parseInt(process.env.POSTGRES_PORT || '5432'),
-      database: process.env.POSTGRES_DB || 'mydatabase',
-      user: process.env.POSTGRES_USER || 'postgres',
-      password: process.env.POSTGRES_PASSWORD || 'password',
-      ssl: false,
-    },
-    pool: {
-      min: 2,
-      max: 10,
-    },
-    migrations: {
-      tableName: 'knex_migrations',
-      directory: './dist/postgres/migrations',
-    },
-    seeds: {
-      directory: './dist/postgres/seeds',
-    },
-  }
 };
 
-// Для Docker используем docker конфиг или production
-const environment = process.env.NODE_ENV || 'development';
-export default config[environment] || config.docker;
+export default knegConfigs[NODE_ENV];

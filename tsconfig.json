@@ -6,6 +6,7 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "sourceRoot": "/",
+    "mapRoot": "/dist",
     "inlineSources": true,
     "strict": true,
     "esModuleInterop": true,
